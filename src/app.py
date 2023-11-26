@@ -227,25 +227,25 @@ def login_user():
 
 
 # Routes for handling game purchases
-@app.route("/purchase_game", methods=["POST"])
-def purchase_game():
-    data = request.json
-    user_id = data.get("user_id")
-    game_id = data.get("game_id")
+# @app.route("/purchase_game", methods=["POST"])
+# def purchase_game():
+#     data = request.json
+#     user_id = data.get("user_id")
+#     game_id = data.get("game_id")
 
-    # Check if the user and game exist
-    user = User.query.get(user_id)
-    game = Game.query.get(game_id)
+#     # Check if the user and game exist
+#     user = User.query.get(user_id)
+#     game = Game.query.get(game_id)
 
-    if user and game:
-        # Perform the purchase logic
-        # Example: Add the game to the user's purchased games
-        user.purchased_games.append(game)
-        db.session.commit()
+#     if user and game:
+#         # Perform the purchase logic
+#         # Example: Add the game to the user's purchased games
+#         user.purchased_games.append(game)
+#         db.session.commit()
 
-        return jsonify({"message": "Game purchased successfully"}), 201
-    else:
-        return jsonify({"message": "User or game not found"}), 404
+#         return jsonify({"message": "Game purchased successfully"}), 201
+#     else:
+#         return jsonify({"message": "User or game not found"}), 404
 
 
 # Route for handling game reviews
