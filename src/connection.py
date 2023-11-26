@@ -9,6 +9,7 @@ ENV_PATH = Path(__file__).resolve().parent.parent.joinpath(".env.example")
 load_dotenv(ENV_PATH)
 
 url = os.getenv("database_URL")
+print(url)
 
 @contextmanager
 def get_db():
