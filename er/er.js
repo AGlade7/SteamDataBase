@@ -12,12 +12,12 @@ erDiagram
 	%%Game Status of review by Steam
 	UnderReview_WE || -- || GameStatus_IR : _
 	GameStatus_IR || -- || Game : _
-	
-	%%Games published by GPC 
+
+	%%Games published by GPC
 	%% GPC = GamePublishingCompany
 	GPC |o -- || Published : _
 	Published || -- o{ Game : _
-%%	GPC }o -- o{ GPC_Followers : FollowedBy 
+%%	GPC }o -- o{ GPC_Followers : FollowedBy
 	GPC }o -- || FollowedBy: _
 	FollowedBy || -- || User: _
 	Game || -- || AvailabeIn_IR : _
@@ -27,13 +27,13 @@ erDiagram
 	Game || -- || BelongsTo: _
 	BelongsTo|| -- o{ Genre: _
 	BelongsTo|| -- o{ Game_Genre: _
-	
+
 	UnderReview_WE || -- || IsAvailable : _
 	IsAvailable || -- || AvailableGames : _
 	Game || -- || IsAvailable : _
 	User || -- || Reviewed : _
-	Game || -- || Reviewed : _ 
-	Review || -- || Reviewed : _ 
+	Game || -- || Reviewed : _
+	Review || -- || Reviewed : _
 
 	Game || -- || Supports : _
 	Supports || -- || Game_Language : _
@@ -56,12 +56,12 @@ erDiagram
 		varchar(255) Email_ID
 	}
 	%%GPC_Games{
-	%%	int GPC_ID PK, FK 
+	%%	int GPC_ID PK, FK
 	%%	int GameID PK, FK
 	%%}
 	Game{
 		int Game_ID PK
-		varchar(255) Game_Name 
+		varchar(255) Game_Name
 		decimal(10)(2) Price
 		int GPC_ID FK
 		date Game_Release_Date
@@ -90,8 +90,8 @@ erDiagram
 	}
 	AvailableGames{
 		int Game_ID FK
-		varchar(255) Game_Name 
-		
+		varchar(255) Game_Name
+
 	}
 	Review{
 		int User_ID FK
@@ -102,7 +102,7 @@ erDiagram
 	}
 	Genre{
 		int genre_id PK
-		varchar(50) genre_name 
+		varchar(50) genre_name
 	}
 	Game_Genre{
 		int genre_id FK
@@ -110,10 +110,10 @@ erDiagram
 	}
 	Language{
 		int lang_id PK
-		varchar(50) lang_name 
+		varchar(50) lang_name
 	}
 	Game_Language{
 		int lang_id FK
 		int game_id FK
 	}
-	
+
