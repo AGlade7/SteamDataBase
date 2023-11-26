@@ -36,6 +36,9 @@ $$ LANGUAGE plpgsql;
 -- SELECT * FROM get_games_by_genre_region_and_age('Action', 'North America', 25);
 
 
+
+
+
 -- Create a stored procedure to add a review for a game
 CREATE OR REPLACE FUNCTION add_review(
     p_user_id INT,
@@ -125,12 +128,11 @@ $$ LANGUAGE plpgsql;
 
 
 
--- Create a stored procedure for user login
+-- Create a stored procedure for user registration
 CREATE OR REPLACE FUNCTION user_login(
     p_username VARCHAR,
     p_password VARCHAR,
     p_region_name VARCHAR,
-    p_language_name VARCHAR,
     p_age INT,
     p_email_id VARCHAR
 )
@@ -351,8 +353,44 @@ EXECUTE FUNCTION add_game_lang_on_game_insert();
 -----------------------------------------------------------------------------------------------
 -- Add Initial Data
 
--- COPY GPC FROM '../init_data/gpc.txt' DELIMITER ',' CSV;
+COPY GPC FROM '../init_data/gpc.txt' DELIMITER ',' CSV;
+COPY Region FROM '../init_data/region.txt' DELIMITER ',' CSV;
+COPY Genre FROM '../init_data/genre.txt' DELIMITER ',' CSV;
+COPY Lang FROM '../init_data/language.txt' DELIMITER ',' CSV;
 -- COPY Game FROM '../init_data/game.txt' DELIMITER ',' CSV;
--- COPY Region FROM '../init_data/region.txt' DELIMITER ',' CSV;
--- COPY Genre FROM '../init_data/genre.txt' DELIMITER ',' CSV;
--- COPY Lang FROM '../init_data/language.txt' DELIMITER ',' CSV;
+
+CREATE TEMPORARY TABLE temp_game_data (
+    Game_ID SERIAL,
+    Game_Name VARCHAR(255),
+    Price DECIMAL(10, 2),
+    GPC_ID SERIAL,
+    Game_Release_Date DATE,
+    Age_Limit INT,
+    Region_Name VARCHAR(255),
+    Genre_Name VARCHAR(50),
+    Lang_Name VARCHAR(50)
+);
+
+COPY temp_game_data(Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit, Region_Name, Genre_Name, Lang_Name)
+FROM '../init_data/game.txt' DELIMITER ',' CSV;
+
+INSERT INTO Game(Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit)
+SELECT Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit
+FROM temp_game_data;
+
+INSERT INTO Game_Region(RegionID, Game_Name)
+SELECT r.RegionID, g.Game_Name
+FROM temp_game_data g
+JOIN Region r ON g.Region_Name = r.Region_Name;
+
+INSERT INTO Game_Genre(Genre_ID, Game_ID)
+SELECT ge.Genre_ID, g.Game_ID
+FROM temp_game_data g
+JOIN Genre ge ON g.Genre_Name = ge.Genre_Name;
+
+INSERT INTO Game_Language(Lang_ID, Game_ID)
+SELECT l.Lang_ID, g.Game_ID
+FROM temp_game_data g
+JOIN Language l ON g.Lang_Name = l.Lang_Name;
+
+DROP TABLE IF EXISTS temp_game_data;
