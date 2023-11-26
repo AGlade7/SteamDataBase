@@ -4,15 +4,12 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # Replace 'your_postgres_url' with your PostgreSQL connection URL
-app.config["SQLALCHEMY_DATABASE_URI"] = "your_postgres_url"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{username}:{pwd}@{hostname}:{port_id}/{database}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
 # Define your models here (User, GPC, Game, Region, ...)
-
-
-# Example User model
 class User(db.Model):
     User_ID = db.Column(db.Integer, primary_key=True)
     Username = db.Column(db.String(255), unique=True, nullable=False)
@@ -170,10 +167,7 @@ def post_review():
         return jsonify({"message": "User or game not found"}), 404
 
 
-# Add more routes for other entities as needed
-
 # ... Existing code ...
-
 if __name__ == "__main__":
     db.create_all()
     app.run(debug=True)
