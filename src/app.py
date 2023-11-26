@@ -166,6 +166,57 @@ def post_review():
     else:
         return jsonify({"message": "User or game not found"}), 404
 
+#get request to show all reviews of a game
+@app.route("/game/<int:game_id>/reviews", methods=["GET"])
+def get_game_reviews(game_id):
+    game = Game.query.get(game_id)
+
+    if game is None:
+        return jsonify({"message": "Game not found"}), 404
+
+    reviews = Review.query.filter_by(Game_ID=game_id).all()
+
+    # Optional: You can customize the format of the reviews before returning them
+    formatted_reviews = [
+        {
+            "user_id": review.User_ID,
+            "username": User.query.get(review.User_ID).Username,
+            "posted_time": str(review.Posted_Time),
+            "content": review.Content,
+        }
+        for review in reviews
+    ]
+
+    return jsonify({"game_name": game.Game_Name, "reviews": formatted_reviews})
+
+# Route for displaying all genres
+@app.route("/genres", methods=["GET"])
+def get_all_genres():
+    genres = Genre.query.all()
+
+    # Optional: You can customize the format of the genres before returning them
+    formatted_genres = [{"genre_id": genre.Genre_ID, "genre_name": genre.Genre_Name} for genre in genres]
+
+    return jsonify({"genres": formatted_genres})
+
+
+# Route for showing all games of a particular genre
+@app.route("/genre/<int:genre_id>/games", methods=["GET"])
+def get_games_by_genre(genre_id):
+    genre = Genre.query.get(genre_id)
+
+    if genre is None:
+        return jsonify({"message": "Genre not found"}), 404
+
+    games = Game_Genre.query.filter_by(Genre_ID=genre_id).all()
+
+    # Optional: You can customize the format of the games before returning them
+    formatted_games = [
+        {"game_id": game.Game_ID, "game_name": Game.query.get(game.Game_ID).Game_Name}
+        for game in games
+    ]
+
+    return jsonify({"genre_name": genre.Genre_Name, "games": formatted_games})
 
 # ... Existing code ...
 if __name__ == "__main__":
