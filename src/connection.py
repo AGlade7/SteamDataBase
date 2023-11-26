@@ -8,22 +8,12 @@ print(Path(__file__))
 ENV_PATH = Path(__file__).resolve().parent.parent.joinpath(".env.example")
 load_dotenv(ENV_PATH)
 
-hostname = os.getenv("DB_HOST")
-database = os.getenv("DB_NAME")
-username = os.getenv("DB_USER")
-pwd = os.getenv("DB_PASSWORD")
-port_id = os.getenv("DB_PORT")
+url = os.getenv("database_URL")
 
 @contextmanager
 def get_db():
     try:
-        conn = psycopg2.connect(
-            host=hostname,
-            dbname=database,
-            user=username,
-            password=pwd,
-            port=port_id,
-        )
+        conn = psycopg2.connect(url)
         print("connected with database")
         cursor = conn.cursor()
         makeDBPath = (
