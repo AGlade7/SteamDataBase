@@ -36,9 +36,6 @@ $$ LANGUAGE plpgsql;
 -- SELECT * FROM get_games_by_genre_region_and_age('Action', 'North America', 25);
 
 
-
-
-
 -- Create a stored procedure to add a review for a game
 CREATE OR REPLACE FUNCTION add_review(
     p_user_id INT,
