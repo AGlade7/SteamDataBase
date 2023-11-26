@@ -4,118 +4,162 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from pathlib import Path
+from fastapi import HTTPException
+from connection import get_db 
 
-ENV_PATH = Path(__file__).resolve().parent.parent.joinpath(".env.example")
-load_dotenv(ENV_PATH)
 app = Flask(__name__)
-
-url = os.getenv("database_URL")
-print(url)
 # Replace 'your_postgres_url' with your PostgreSQL connection URL
-db = psycopg2.connect(url)
+db = get_db()
 
 @app.get("/")
 def home():
     return "hello i am here!"
 
-
 @app.route("/get_games_by_genre_region_and_age", methods=["POST"])
 def get_games_by_genre_region_and_age():
-    data = request.json
-    genre_name = data.get("p_genre_name")
-    region_name = data.get("p_region_name")
-    user_age = data.get("p_user_age")
+    try:
+        data = request.json
+        genre_name = data.get("p_genre_name")
+        region_name = data.get("p_region_name")
+        user_age = data.get("p_user_age")
 
-    # Call the stored procedure to retrieve games
-    result = db.engine.execute(
-        f"SELECT * FROM get_games_by_genre_region_and_age('{genre_name}', '{region_name}', {user_age})"
-    )
+        # Call the stored procedure to retrieve games
+        result = db.engine.execute(
+            f"SELECT * FROM get_games_by_genre_region_and_age('{genre_name}', '{region_name}', {user_age})"
+        )
 
-    # Convert the result to a list of dictionaries
-    games = [dict(row) for row in result]
-
-    return jsonify({"games": games}), 200
+        # Convert the result to a list of dictionaries
+        games = [dict(row) for row in result]
+        print(games)
+        return jsonify({"games": games}), 200
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure make_follow_request: {e}",
+        )
 
 
 @app.route("/add_review", methods=["POST"])
 def add_review():
-    data = request.json
-    user_id = data.get("p_user_id")
-    game_id = data.get("p_game_id")
-    content = data.get("p_content")
+    try:
+        data = request.json
+        user_id = data.get("p_user_id")
+        game_id = data.get("p_game_id")
+        content = data.get("p_content")
 
-    # Call the stored procedure to add a review
-    db.engine.execute(f"CALL add_review({user_id}, {game_id}, '{content}')")
+        # Call the stored procedure to add a review
+        db.engine.execute(f"CALL add_review({user_id}, {game_id}, '{content}')")
 
-    return jsonify({"message": "Review added successfully"}), 201
+        return jsonify({"message": "Review added successfully"}), 201
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure make_follow_request: {e}",
+        )
 
 
 @app.route("/get_reviews_for_game", methods=["POST"])
 def get_reviews_for_game():
-    data = request.json
-    game_id = data.get("p_game_id")
+    try:
+        data = request.json
+        game_id = data.get("p_game_id")
 
-    # Call the stored procedure to get all reviews for a game
-    result = db.engine.execute(f"SELECT * FROM get_reviews_for_game({game_id})")
+        # Call the stored procedure to get all reviews for a game
+        result = db.engine.execute(f"SELECT * FROM get_reviews_for_game({game_id})")
 
-    # Process the result into a JSON response
-    reviews = []
-    for row in result:
-        reviews.append(
-            {
-                "User_Name": row.User_Name,
-                "Content": row.Content,
-                "Posted_Time": str(row.Posted_Time),
-            }
+        # Process the result into a JSON response
+        reviews = []
+        for row in result:
+            reviews.append(
+                {
+                    "User_Name": row.User_Name,
+                    "Content": row.Content,
+                    "Posted_Time": str(row.Posted_Time),
+                }
+            )
+
+        return jsonify(reviews), 200
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure make_follow_request: {e}",
         )
-
-    return jsonify(reviews), 200
 
 
 @app.route("/get_bought_games", methods=["POST"])
 def get_bought_games():
-    data = request.json
-    user_id = data.get("p_user_id")
+    try:
+        data = request.json
+        user_id = data.get("p_user_id")
 
-    # Call the stored procedure to get games bought by a user
-    result = db.engine.execute(f"SELECT * FROM get_bought_games({user_id})")
+        # Call the stored procedure to get games bought by a user
+        result = db.engine.execute(f"SELECT * FROM get_bought_games({user_id})")
 
-    # Process the result into a JSON response
-    bought_games = []
-    for row in result:
-        bought_games.append({"Game_Name": row.Game_Name, "GPC_Name": row.GPC_Name})
+        # Process the result into a JSON response
+        bought_games = []
+        for row in result:
+            bought_games.append({"Game_Name": row.Game_Name, "GPC_Name": row.GPC_Name})
 
-    return jsonify(bought_games), 200
+        return jsonify(bought_games), 200
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure make_follow_request: {e}",
+        )
 
 
 @app.route("/user_login", methods=["POST"])
 def user_login():
-    data = request.json
-    username = data.get("p_username")
-    password = data.get("p_password")
-    region_name = data.get("p_region_name")
-    language_name = data.get("p_language_name")
-    age = data.get("p_age")
-    email_id = data.get("p_email_id")
+    try:
+        data = request.json
+        username = data.get("p_username")
+        password = data.get("p_password")
+        region_name = data.get("p_region_name")
+        language_name = data.get("p_language_name")
+        age = data.get("p_age")
+        email_id = data.get("p_email_id")
 
-    # Call the stored procedure for user login
-    db.engine.execute(
-        f"CALL user_login('{username}', '{password}', '{region_name}', '{language_name}', {age}, '{email_id}')"
-    )
+        # Call the stored procedure for user login
+        db.engine.execute(
+            f"CALL user_login('{username}', '{password}', '{region_name}', '{language_name}', {age}, '{email_id}')"
+        )
 
-    return jsonify({"message": "User login successful"}), 200
+        return jsonify({"message": "User login successful"}), 200
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure make_follow_request: {e}",
+        )
 
 
 @app.route("/purchase_game", methods=["POST"])
 def purchase_game():
-    data = request.json
-    user_id = data.get("p_user_id")
-    game_id = data.get("p_game_id")
+    try:
+        data = request.json
+        user_id = data.get("p_user_id")
+        game_id = data.get("p_game_id")
 
-    # Call the stored procedure for purchasing a game
-    db.engine.execute(f"CALL purchase_game({user_id}, {game_id})")
+        # Call the stored procedure for purchasing a game
+        db.engine.execute(f"CALL purchase_game({user_id}, {game_id})")
 
-    return jsonify({"message": "Game purchased successfully"}), 201
+        return jsonify({"message": "Game purchased successfully"}), 201
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure make_follow_request: {e}",
+        )
 
 
 # # Routes for user registration and login
