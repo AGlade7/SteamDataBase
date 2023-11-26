@@ -102,7 +102,7 @@ erDiagram
 	%%	varchar(10) status
 	%%}
 	AvailableGames{
-		int Game_ID FK PK
+		int Game_ID FK
 		int GPC_ID FK
 		varchar(255) GPC_Name
 		varchar(255) Game_Name
