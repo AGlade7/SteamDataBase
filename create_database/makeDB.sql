@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS steamdb;
-CREATE DATABASE steamdb;
+-- DROP DATABASE IF EXISTS steamdb;
+-- CREATE DATABASE steamdb;
 
-CREATE TABLE User (
+CREATE TABLE UserData (
     User_ID SERIAL PRIMARY KEY,
     Username VARCHAR(255),
     Password VARCHAR(255),
@@ -55,10 +55,10 @@ CREATE TABLE AvailableGames (
 CREATE TABLE Review (
     User_ID SERIAL,
     Game_ID SERIAL,
-    Posted_Time DATETIME,
-    Edited_Time DATETIME,
+    Posted_Time TIMESTAMP,
+    Edited_Time TIMESTAMP,
     Content VARCHAR(100),
-    FOREIGN KEY (User_ID) REFERENCES User(User_ID),
+    FOREIGN KEY (User_ID) REFERENCES UserData(User_ID),
     FOREIGN KEY (Game_ID) REFERENCES Game(Game_ID),
     PRIMARY KEY (User_ID, Game_ID)
 );
@@ -108,4 +108,6 @@ BEFORE INSERT ON Game
 FOR EACH ROW
 EXECUTE FUNCTION add_genre_on_game_insert();
 
-COPY Game FROM '../client/game_query.txt' DELIMITER ',' CSV;
+-- COPY Game
+-- FROM
+--     'C:/Users/aprit/OneDrive/Documents/stream_database/client/game_query.txt' DELIMITER ',' CSV;
