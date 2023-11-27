@@ -13,12 +13,15 @@ p_username : str , p_password: str, p_region_name: str,p_language_name: str, p_a
 
 // add game
 {
-  "p_game_id":1,
-  "p_game_name": "cup head",
+  "p_game_id":15,
+  "p_game_name": "Shooter Master",
   "p_price":100.60,
   "p_gpc_id":3,
   "p_game_release_date": "2016-12-11",
-  "p_age_limit": 23
+  "p_age_limit": 23,
+  "p_region_id":1,
+  "p_genre_id": 3,
+  "p_Lang_id" : 312307
 }
 
 //add gpc
