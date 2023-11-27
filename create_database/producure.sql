@@ -21,7 +21,7 @@ BEGIN
     FROM
         Game G
         JOIN GPC ON G.GPC_ID = GPC.GPC_ID
-        JOIN Game_Region GR ON G.Game_ID = GR.Game_ID
+        JOIN Game_Region GR ON G.Game_Name = GR.Game_Name
         JOIN Region R ON GR.RegionID = R.RegionID
         JOIN Game_Genre GG ON G.Game_ID = GG.Game_ID
         JOIN Genre GN ON GG.Genre_ID = GN.Genre_ID
