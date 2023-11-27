@@ -34,11 +34,6 @@ $$ LANGUAGE plpgsql;
 
 -- -- Call the stored procedure to get games by genre ("Action"), region ("North America"), and age (e.g., 25)
 -- SELECT * FROM get_games_by_genre_region_and_age('Action', 'North America', 25);
-
-
-
-
-
 -- Create a stored procedure to add a review for a game
 CREATE OR REPLACE FUNCTION add_review(
     p_user_id INT,
@@ -65,11 +60,6 @@ $$ LANGUAGE plpgsql;
 
 -- -- Call the stored procedure to add a review
 -- CALL add_review(1, 101, 'This game is amazing!');
-
-
-
-
-
 -- Create a stored procedure to get all reviews for a game
 CREATE OR REPLACE FUNCTION get_reviews_for_game(
     p_game_id INT
@@ -95,11 +85,6 @@ $$ LANGUAGE plpgsql;
 
 -- -- Call the stored procedure to get all reviews for a game with ID 101
 -- SELECT * FROM get_reviews_for_game(101);
-
-
-
-
-
 -- Create a stored procedure to get all games bought by a user
 CREATE OR REPLACE FUNCTION get_bought_games(
     p_user_id SERIAL
@@ -124,9 +109,6 @@ $$ LANGUAGE plpgsql;
 
 -- -- Call the stored procedure to get games bought by user with ID 1
 -- SELECT * FROM get_bought_games(1);
-
-
-
 
 -- Create a stored procedure for user registration
 CREATE OR REPLACE FUNCTION user_login(
@@ -165,11 +147,6 @@ $$ LANGUAGE plpgsql;
 -- -- Call the stored procedure for user login
 -- CALL user_login('JohnDoe', 'password123', 'North America', 'English', 25, 'john.doe@example.com');
 
-
-
-
-
-
 -- Create a stored procedure for purchasing a game and adding it to UserGames table
 CREATE OR REPLACE FUNCTION purchase_game(
     p_user_id INT,
@@ -185,7 +162,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 ------------------------------------------------------------------------------------------------
-
 -- TRIGGERS
 -- Create a function to add a genre to the Genre table if it doesn't already exist
 CREATE OR REPLACE FUNCTION add_genre_on_game_insert()
@@ -206,10 +182,6 @@ BEFORE INSERT ON Game
 FOR EACH ROW
 EXECUTE FUNCTION add_genre_on_game_insert();
 
-
-
-
-
 -- Create a function to add a language to the Lang table if it doesn't already exist
 CREATE OR REPLACE FUNCTION add_language_on_user_insert()
 RETURNS TRIGGER AS $$
@@ -228,9 +200,6 @@ CREATE TRIGGER before_user_insert
 BEFORE INSERT ON UserData
 FOR EACH ROW
 EXECUTE FUNCTION add_language_on_user_insert();
-
-
-
 
 -- Create a function to add a region to the Region table if it doesn't already exist
 CREATE OR REPLACE FUNCTION add_region_on_user_insert()
@@ -251,9 +220,6 @@ BEFORE INSERT ON UserData
 FOR EACH ROW
 EXECUTE FUNCTION add_region_on_user_insert();
 
-
-
-
 -- Create a function to add (user, region) to user_region
 CREATE OR REPLACE FUNCTION add_user_region_on_user_insert()
 RETURNS TRIGGER AS $$
@@ -272,13 +238,6 @@ CREATE TRIGGER before_user_insert
 BEFORE INSERT ON UserData
 FOR EACH ROW
 EXECUTE FUNCTION add_user_region_on_user_insert();
-
-
-
-
-
-
-
 
 -- Create a function to add (game, region) to game_region
 CREATE OR REPLACE FUNCTION add_game_region_on_game_insert()
@@ -299,11 +258,6 @@ BEFORE INSERT ON Game
 FOR EACH ROW
 EXECUTE FUNCTION add_game_region_on_game_insert();
 
-
-
-
-
-
 -- Create a function to add (game, genre) to game_genre
 CREATE OR REPLACE FUNCTION add_game_genre_on_game_insert()
 RETURNS TRIGGER AS $$
@@ -322,11 +276,6 @@ CREATE TRIGGER before_game_insert
 BEFORE INSERT ON Game
 FOR EACH ROW
 EXECUTE FUNCTION add_game_genre_on_game_insert();
-
-
-
-
-
 
 -- Create a function to add (game, language) to game_lang
 CREATE OR REPLACE FUNCTION add_game_lang_on_game_insert()
@@ -347,10 +296,7 @@ BEFORE INSERT ON Game
 FOR EACH ROW
 EXECUTE FUNCTION add_game_lang_on_game_insert();
 
-
-
-
------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
 -- Add Initial Data
 
 COPY GPC FROM '../init_data/gpc.txt' DELIMITER ',' CSV;
