@@ -1,0 +1,8 @@
+COPY GPC FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/gpc.txt' DELIMITER ',' CSV;
+COPY Region FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/region.txt' DELIMITER ',' CSV;
+COPY Genre FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/genre.txt' DELIMITER ',' CSV;
+COPY Lang FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/language.txt' DELIMITER ',' CSV;
+-- \COPY Game FROM '../init_data/game.txt' DELIMITER ',' CSV;
+
+COPY temp_game_data(Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit, Region_Name, Genre_Name, Lang_Name)
+FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/game.txt' DELIMITER ',' CSV;

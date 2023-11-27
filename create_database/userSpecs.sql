@@ -106,7 +106,7 @@ CREATE OR REPLACE FUNCTION get_bought_games(
 )
 RETURNS TABLE (
     Game_Name VARCHAR,
-    GPC_Name VARCHAR,
+    GPC_Name VARCHAR
 ) AS $$
 BEGIN
     RETURN QUERY

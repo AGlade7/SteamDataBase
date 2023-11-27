@@ -117,7 +117,6 @@
 -- -- -- Call the stored procedure to get all reviews for a game with ID 101
 -- -- SELECT * FROM get_reviews_for_game(101);
 -- -- Create a stored procedure to get all games bought by a user
-
 -- CREATE OR REPLACE FUNCTION get_bought_games(
 --     p_user_id INT
 -- )
@@ -209,7 +208,7 @@ $$ LANGUAGE plpgsql;
 -- $$ LANGUAGE plpgsql;
 
 -- -- Create a trigger to call the add_genre_on_game_insert() function
--- CREATE TRIGGER before_game_insert1
+-- CREATE TRIGGER before_game_insert
 -- BEFORE INSERT ON Game
 -- FOR EACH ROW
 -- EXECUTE FUNCTION add_genre_on_game_insert();
@@ -285,7 +284,7 @@ $$ LANGUAGE plpgsql;
 -- $$ LANGUAGE plpgsql;
 
 -- -- Create a trigger to call the add_game_region_on_game_insert() function
--- CREATE TRIGGER before_game_insert2
+-- CREATE TRIGGER before_game_insert
 -- BEFORE INSERT ON Game
 -- FOR EACH ROW
 -- EXECUTE FUNCTION add_game_region_on_game_insert();
@@ -304,7 +303,7 @@ $$ LANGUAGE plpgsql;
 -- $$ LANGUAGE plpgsql;
 
 -- -- Create a trigger to call the add_game_genre_on_game_insert() function
--- CREATE TRIGGER before_game_insert3
+-- CREATE TRIGGER before_game_insert
 -- BEFORE INSERT ON Game
 -- FOR EACH ROW
 -- EXECUTE FUNCTION add_game_genre_on_game_insert();
@@ -323,7 +322,7 @@ $$ LANGUAGE plpgsql;
 -- $$ LANGUAGE plpgsql;
 
 -- -- Create a trigger to call the add_game_lang_on_game_insert() function
--- CREATE TRIGGER before_game_insert4
+-- CREATE TRIGGER before_game_insert
 -- BEFORE INSERT ON Game
 -- FOR EACH ROW
 -- EXECUTE FUNCTION add_game_lang_on_game_insert();
@@ -331,29 +330,26 @@ $$ LANGUAGE plpgsql;
 -- -------------------------------------------------------------------------------------------
 -- -- Add Initial Data
 
--- COPY GPC FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/gpc.txt' DELIMITER ',' CSV;
--- COPY Region FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/region.txt' DELIMITER ',' CSV;
--- COPY Genre FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/genre.txt' DELIMITER ',' CSV;
--- COPY Lang FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/language.txt' DELIMITER ',' CSV;
--- -- \COPY Game FROM '../init_data/game.txt' DELIMITER ',' CSV;
+-- COPY GPC FROM '../init_data/gpc.txt' DELIMITER ',' CSV;
+-- COPY Region FROM '../init_data/region.txt' DELIMITER ',' CSV;
+-- COPY Genre FROM '../init_data/genre.txt' DELIMITER ',' CSV;
+-- COPY Lang FROM '../init_data/language.txt' DELIMITER ',' CSV;
+-- -- COPY Game FROM '../init_data/game.txt' DELIMITER ',' CSV;
 
--- CREATE TEMPORARY SEQUENCE temp_game_data_Game_ID_seq AS integer;
 -- CREATE TEMPORARY TABLE temp_game_data (
---     Game_ID integer NOT NULL DEFAULT nextval('temp_game_data_Game_ID_seq'),
+--     Game_ID INT,
 --     Game_Name VARCHAR(255),
 --     Price DECIMAL(10, 2),
---     GPC_ID integer NOT NULL DEFAULT nextval('temp_game_data_Game_ID_seq'),
+--     GPC_ID INT,
 --     Game_Release_Date DATE,
 --     Age_Limit INT,
 --     Region_Name VARCHAR(255),
 --     Genre_Name VARCHAR(50),
 --     Lang_Name VARCHAR(50)
 -- );
--- ALTER SEQUENCE temp_game_data_Game_ID_seq OWNED BY temp_game_data.Game_ID;
--- ALTER SEQUENCE temp_game_data_GPC_ID_seq OWNED BY temp_game_data.GPC_ID;
 
 -- COPY temp_game_data(Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit, Region_Name, Genre_Name, Lang_Name)
--- FROM 'C:/Users/aprit/OneDrive/Documents/stream_database/init_data/game.txt' DELIMITER ',' CSV;
+-- FROM '../init_data/game.txt' DELIMITER ',' CSV;
 
 -- INSERT INTO Game(Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit)
 -- SELECT Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit
