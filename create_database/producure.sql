@@ -117,29 +117,71 @@
 -- -- -- Call the stored procedure to get all reviews for a game with ID 101
 -- -- SELECT * FROM get_reviews_for_game(101);
 -- -- Create a stored procedure to get all games bought by a user
--- CREATE OR REPLACE FUNCTION get_bought_games(
---     p_user_id INT
--- )
--- RETURNS TABLE (
---     Game_Name VARCHAR,
---     GPC_Name VARCHAR
--- ) AS $$
--- BEGIN
---     RETURN QUERY
---     SELECT
---         G.Game_Name,
---         GPC.GPC_Name
---     FROM
---         Game G
---         JOIN GPC ON G.GPC_ID = GPC.GPC_ID
---         JOIN UserGames UG ON G.Game_ID = UG.Game_ID
---     WHERE 
---         UG.User_ID = p_user_id;
--- END;
--- $$ LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION get_bought_games(
+    p_user_id INT
+)
+RETURNS TABLE (
+    Game_Name VARCHAR,
+    GPC_Name VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        G.Game_Name,
+        GPC.GPC_Name
+    FROM
+        Game G
+        JOIN GPC ON G.GPC_ID = GPC.GPC_ID
+        JOIN UserGames UG ON G.Game_ID = UG.Game_ID
+    WHERE 
+        UG.User_ID = p_user_id;
+END;
+$$ LANGUAGE plpgsql;
 
 -- -- Call the stored procedure to get games bought by user with ID 1
 -- SELECT * FROM get_bought_games(1);
+
+-- adding companies/gpc
+CREATE OR REPLACE FUNCTION add_gpc(
+    p_gpc_id INT,
+    p_gpc_name VARCHAR(255),
+    p_email_id VARCHAR(255)
+)
+RETURNS VOID AS $$
+BEGIN
+    -- Check if the GPC already exists
+    IF NOT EXISTS (SELECT 1 FROM GPC WHERE GPC_ID = p_gpc_id) THEN
+        -- Insert the GPC
+        INSERT INTO GPC (GPC_ID, GPC_Name, Email_ID)
+        VALUES (p_gpc_id, p_gpc_name, p_email_id);
+    ELSE
+        RAISE EXCEPTION 'Game production company with ID % already exists.', p_gpc_id;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- adding games 
+CREATE OR REPLACE FUNCTION add_game(
+    p_game_id INT,
+    p_game_name TEXT,
+    p_price DECIMAL(10, 2),
+    p_gpc_id INT,
+    p_game_release_date DATE,
+    p_age_limit INT
+)
+RETURNS VOID AS $$
+BEGIN
+    -- Check if the game production company (GPC) exists
+    IF NOT EXISTS (SELECT 1 FROM GPC WHERE GPC_ID = p_gpc_id) THEN
+        RAISE EXCEPTION 'Game production company with ID % does not exist.', p_gpc_id;
+    END IF;
+
+    -- Insert the game
+    INSERT INTO Game (Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit)
+    VALUES (p_game_id, p_game_name, p_price, p_gpc_id, p_game_release_date, p_age_limit);
+
+END;
+$$ LANGUAGE plpgsql;
 
 -- Create a stored procedure for user registration
 CREATE OR REPLACE FUNCTION user_login(
@@ -176,22 +218,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- -- Call the stored procedure for user login
--- CALL user_login('JohnDoe', 'password123', 'North America', 'English', 25, 'john.doe@example.com');
+CREATE OR REPLACE FUNCTION purchase_game(
+    p_user_id INT,
+    p_game_id INT
+)
+RETURNS VOID AS $$
+BEGIN
+    -- Insert the purchase
+    INSERT INTO UserGames (User_ID, Game_ID)
+    VALUES (p_user_id, p_game_id);
 
--- Create a stored procedure for purchasing a game and adding it to UserGames table
--- CREATE OR REPLACE FUNCTION purchase_game(
---     p_user_id INT,
---     p_game_id INT
--- )
--- RETURNS VOID AS $$
--- BEGIN
---     -- Insert the purchase
---     INSERT INTO UserGames (User_ID, Game_ID)
---     VALUES (p_user_id, p_game_id);
-
--- END;
--- $$ LANGUAGE plpgsql;
+END;
+$$ LANGUAGE plpgsql;
 
 -- ------------------------------------------------------------------------------------------------
 -- -- TRIGGERS
