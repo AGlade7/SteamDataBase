@@ -34,7 +34,12 @@ p_username : str , p_password: str, p_region_name: str,p_language_name: str, p_a
   "p_game_id": 3
 }
 
-//
+// add review
+{
+  "p_user_id": 1,
+  "p_game_id":4,
+  "p_content": "game was really awesome"
+}
 
 
 
