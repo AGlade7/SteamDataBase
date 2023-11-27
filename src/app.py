@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from fastapi import HTTPException
+from fastapi import status
 from connection import get_db
+import hashlib
 
 app = Flask(__name__)
 db = get_db()
@@ -63,32 +65,37 @@ def add_review():
 
 @app.route("/get_reviews_for_game", methods=["POST"])
 def get_reviews_for_game():
-    try:
-        data = request.json
-        game_id = data.get("p_game_id")
+    # try:
+        # Get the JSON payload from the request
+    data = request.json
+
+    # Extract the game_id from the payload
+    game_id = data.get("p_game_id")
+
+    # Process the result into a JSON response
+    with get_db() as cursor:
+        cursor.execute(f"SELECT * FROM get_reviews_for_game({game_id})")
 
         # Process the result into a JSON response
-        with get_db() as cursor:
-            cursor.execute(f"SELECT * FROM get_reviews_for_game({game_id})")
-            # Process the result into a JSON response
-            reviews = []
-            for row in cursor:
-                reviews.append(
-                    {
-                        "User_Name": row.User_Name,
-                        "Content": row.Content,
-                        "Posted_Time": str(row.Posted_Time),
-                    }
-                )
+        reviews = []
+        for row in cursor:
+            reviews.append(
+                {
+                    "User_Name": row.User_Name,
+                    "Content": row.Content,
+                    "Posted_Time": str(row.Posted_Time),
+                }
+            )
 
-            return jsonify(reviews), 200
-    except HTTPException as e:
-        raise e  # Rethrow HTTPException with status code and details
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error calling stored procedure make_follow_request: {e}",
-        )
+        return jsonify(reviews), 200
+
+    # except HTTPException as e:
+    #     raise e  # Rethrow HTTPException with status code and details
+    # except Exception as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    #         detail=f"Error calling stored procedure get_reviews_for_game: {e}",
+    #     )
 
 
 @app.route("/get_bought_games", methods=["POST"])
@@ -118,43 +125,28 @@ def get_bought_games():
 
 @app.route("/user_login", methods=["POST"])
 def user_login():
-    # try:
-    data = request.json
-    username = data.get("p_username")
-    password = data.get("p_password")
-    region_name = data.get("p_region_name")
-    age = data.get("p_age")
-    email_id = data.get("p_email_id")
-
-    # Call the stored procedure for user login
-    with get_db() as cursor:
-        cursor.execute(
-            f"CALL user_login('{username}', '{password}', '{region_name}', {age}, '{email_id}')"
-        )
-
-    print(data)
-    return jsonify({"message": "User login successful"}), 200
-    # except HTTPException as e:
-    #     raise e  # Rethrow HTTPException with status code and details
-    # except Exception as e:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail=f"Error calling stored procedure make_follow_request: {e}",
-    #     )
-
-
-@app.route("/purchase_game", methods=["POST"])
-def purchase_game():
     try:
         data = request.json
-        user_id = data.get("p_user_id")
-        game_id = data.get("p_game_id")
+        p_username = data.get("p_username")
+        p_password = data.get("p_password")
+        p_region_name = data.get("p_region_name")
+        p_language_name = data.get("p_language_name")
+        p_age = data.get("p_age")
+        p_email_id = data.get("p_email_id")
 
-        # Call the stored procedure for purchasing a game
+        
+        plangidd = hashlib.sha256((p_language_name.lower()).encode()).hexdigest()
+        p_lang_id = int(plangidd[:5], 16)
+        print(p_lang_id)
+
+        # Call the stored procedure for user login
         with get_db() as cursor:
-            cursor.execute(f"CALL purchase_game({user_id}, {game_id})")
+            cursor.execute(
+                f"SELECT user_login('{p_username}','{p_password}','{p_region_name}','{p_language_name}',{p_age},'{p_email_id}', '{p_lang_id}');"
+            )
 
-        return jsonify({"message": "Game purchased successfully"}), 201
+        print(data)
+        return jsonify({"message": "User login successful"}), 200
     except HTTPException as e:
         raise e  # Rethrow HTTPException with status code and details
     except Exception as e:
@@ -162,6 +154,27 @@ def purchase_game():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error calling stored procedure make_follow_request: {e}",
         )
+
+
+@app.route("/purchase_game", methods=["POST"])
+def purchase_game():
+    # try:
+    data = request.json
+    user_id = data.get("p_user_id")
+    game_id = data.get("p_game_id")
+
+    # Call the stored procedure for purchasing a game
+    with get_db() as cursor:
+        cursor.execute(f"CALL purchase_game({user_id}, {game_id})")
+
+    return jsonify({"message": "Game purchased successfully"}), 201
+    # except HTTPException as e:
+    #     raise e  # Rethrow HTTPException with status code and details
+    # except Exception as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    #         detail=f"Error calling stored procedure make_follow_request: {e}",
+    #     )
 
 
 # # Routes for user registration and login

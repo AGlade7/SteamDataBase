@@ -125,36 +125,30 @@ $$ LANGUAGE plpgsql;
 -- -- Call the stored procedure to get games bought by user with ID 1
 -- SELECT * FROM get_bought_games(1);
 
-
-
-
 -- Create a stored procedure for user registration
 CREATE OR REPLACE FUNCTION user_login(
     p_username VARCHAR,
     p_password VARCHAR,
     p_region_name VARCHAR,
+    p_language_name VARCHAR,
     p_age INT,
-    p_email_id VARCHAR
+    p_email_id VARCHAR,
+    p_lang_id INT
 )
 RETURNS VOID AS $$
 BEGIN
     -- Insert data into User_Region
     INSERT INTO Region (Region_Name)
-    VALUES (p_region_name)
-    ON CONFLICT (Region_Name) DO NOTHING;
+    VALUES (p_region_name);
 
     INSERT INTO User_Region (RegionID, User_Name)
-    VALUES ((SELECT RegionID FROM Region WHERE Region_Name = p_region_name), p_username)
-    ON CONFLICT (RegionID, User_Name) DO NOTHING;
+    VALUES ((SELECT RegionID FROM Region WHERE Region_Name = p_region_name), p_username);
+    -- ON CONFLICT (RegionID, User_Name) DO NOTHING;
 
     -- Insert data into User_Lang
-    INSERT INTO Language (Lang_Name)
-    VALUES (p_language_name)
-    ON CONFLICT (Lang_Name) DO NOTHING;
-
-    INSERT INTO User_Lang (Lang_ID, User_Name)
-    VALUES ((SELECT Lang_ID FROM Language WHERE Lang_Name = p_language_name), p_username)
-    ON CONFLICT (Lang_ID, User_Name) DO NOTHING;
+    INSERT INTO Lang (Lang_ID, Lang_Name)
+    VALUES (p_lang_id, p_language_name)
+    ON CONFLICT (Lang_ID) DO NOTHING;
 
     -- Insert data into UserData
     INSERT INTO UserData (Username, Pass, Langg, Age, Email_ID)
@@ -353,11 +347,11 @@ EXECUTE FUNCTION add_game_lang_on_game_insert();
 -----------------------------------------------------------------------------------------------
 -- Add Initial Data
 
-COPY GPC FROM '../init_data/gpc.txt' DELIMITER ',' CSV;
-COPY Region FROM '../init_data/region.txt' DELIMITER ',' CSV;
-COPY Genre FROM '../init_data/genre.txt' DELIMITER ',' CSV;
-COPY Lang FROM '../init_data/language.txt' DELIMITER ',' CSV;
--- COPY Game FROM '../init_data/game.txt' DELIMITER ',' CSV;
+-- COPY GPC FROM 'C:/Users/Satya/OneDrive/Documents/GitHub/SteamDataBase/init_data/gpc.txt' DELIMITER ',' CSV;
+-- COPY Region FROM '../init_data/region.txt' DELIMITER ',' CSV;
+-- COPY Genre FROM '../init_data/genre.txt' DELIMITER ',' CSV;
+-- COPY Lang FROM '../init_data/language.txt' DELIMITER ',' CSV;
+-- -- COPY Game FROM '../init_data/game.txt' DELIMITER ',' CSV;
 
 CREATE TEMPORARY TABLE temp_game_data (
     Game_ID INT,
@@ -371,8 +365,8 @@ CREATE TEMPORARY TABLE temp_game_data (
     Lang_Name VARCHAR(50)
 );
 
-COPY temp_game_data(Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit, Region_Name, Genre_Name, Lang_Name)
-FROM '../init_data/game.txt' DELIMITER ',' CSV;
+-- COPY temp_game_data(Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit, Region_Name, Genre_Name, Lang_Name)
+-- FROM '../init_data/game.txt' DELIMITER ',' CSV;
 
 INSERT INTO Game(Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit)
 SELECT Game_ID, Game_Name, Price, GPC_ID, Game_Release_Date, Age_Limit
@@ -388,9 +382,9 @@ SELECT ge.Genre_ID, g.Game_ID
 FROM temp_game_data g
 JOIN Genre ge ON g.Genre_Name = ge.Genre_Name;
 
-INSERT INTO Game_Language(Lang_ID, Game_ID)
+INSERT INTO Game_Lang(Lang_ID, Game_ID)
 SELECT l.Lang_ID, g.Game_ID
 FROM temp_game_data g
-JOIN Language l ON g.Lang_Name = l.Lang_Name;
+JOIN Lang l ON g.Lang_Name = l.Lang_Name;
 
 DROP TABLE IF EXISTS temp_game_data;

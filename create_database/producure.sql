@@ -146,28 +146,29 @@ CREATE OR REPLACE FUNCTION user_login(
     p_username VARCHAR,
     p_password VARCHAR,
     p_region_name VARCHAR,
+    p_language_name VARCHAR,
     p_age INT,
-    p_email_id VARCHAR
+    p_email_id VARCHAR,
+    p_lang_id INT
 )
 RETURNS VOID AS $$
 BEGIN
     -- Insert data into User_Region
     INSERT INTO Region (Region_Name)
-    VALUES (p_region_name)
-    ON CONFLICT (Region_Name) DO NOTHING;
-
+    VALUES (p_region_name);
+    
     INSERT INTO User_Region (RegionID, User_Name)
-    VALUES ((SELECT RegionID FROM Region WHERE Region_Name = p_region_name), p_username)
-    ON CONFLICT (RegionID, User_Name) DO NOTHING;
+    VALUES ((SELECT RegionID FROM Region WHERE Region_Name = p_region_name), p_username);
+    -- ON CONFLICT (RegionID, User_Name) DO NOTHING;
 
     -- Insert data into User_Lang
-    INSERT INTO Language (Lang_Name)
-    VALUES (p_language_name)
-    ON CONFLICT (Lang_Name) DO NOTHING;
+    INSERT INTO Lang (Lang_ID, Lang_Name)
+    VALUES (p_lang_id, p_language_name)
+    ON CONFLICT (Lang_ID) DO NOTHING;
 
-    INSERT INTO User_Lang (Lang_ID, User_Name)
-    VALUES ((SELECT Lang_ID FROM Language WHERE Lang_Name = p_language_name), p_username)
-    ON CONFLICT (Lang_ID, User_Name) DO NOTHING;
+    -- INSERT INTO User_Lang (Lang_ID, User_Name)
+    -- VALUES ((SELECT Lang_ID FROM Language WHERE Lang_Name = p_language_name), p_username)
+    -- ON CONFLICT (Lang_ID, User_Name) DO NOTHING;
 
     -- Insert data into UserData
     INSERT INTO UserData (Username, Pass, Langg, Age, Email_ID)
