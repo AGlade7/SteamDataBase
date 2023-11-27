@@ -181,29 +181,6 @@ $$ LANGUAGE plpgsql;
 ------------------------------------------------------------------------------------------------
 
 -- TRIGGERS
--- Create a function to add a genre to the Genre table if it doesn't already exist
-CREATE OR REPLACE FUNCTION add_genre_on_game_insert()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Check if the genre already exists in the Genre table
-    INSERT INTO Genre (Genre_Name)
-    VALUES (NEW.Genre_Name)
-    ON CONFLICT (Genre_Name) DO NOTHING;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Create a trigger to call the add_genre_on_game_insert() function
-CREATE TRIGGER before_game_insert1
-BEFORE INSERT ON Game
-FOR EACH ROW
-EXECUTE FUNCTION add_genre_on_game_insert();
-
-
-
-
-
 -- Create a function to add a language to the Lang table if it doesn't already exist
 CREATE OR REPLACE FUNCTION add_language_on_user_insert()
 RETURNS TRIGGER AS $$
@@ -216,12 +193,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Create a trigger to call the add_language_on_user_insert() function
-CREATE TRIGGER before_user_insert1
-BEFORE INSERT ON UserData
-FOR EACH ROW
-EXECUTE FUNCTION add_language_on_user_insert();
 
 
 
@@ -239,12 +210,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create a trigger to call the add_region_on_user_insert() function
-CREATE TRIGGER before_user_insert2
-BEFORE INSERT ON UserData
-FOR EACH ROW
-EXECUTE FUNCTION add_region_on_user_insert();
-
 
 
 
@@ -261,15 +226,45 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+
+CREATE OR REPLACE FUNCTION wrapper_user_function()
+RETURNS TRIGGER AS $$
+BEGIN
+    
+    PERFORM add_region_on_user_insert()
+
+    PERFORM add_region_on_user_insert()
+
+    PERFORM add_user_region_on_user_insert()
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- Create a trigger to call the add_user_region_on_user_insert() function
-CREATE TRIGGER before_user_insert3
+CREATE TRIGGER before_user_insert
 BEFORE INSERT ON UserData
 FOR EACH ROW
-EXECUTE FUNCTION add_user_region_on_user_insert();
+EXECUTE FUNCTION wrapper_user_function();
 
 
 
 
+
+-- Create a function to add a genre to the Genre table if it doesn't already exist
+CREATE OR REPLACE FUNCTION add_genre_on_game_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if the genre already exists in the Genre table
+    INSERT INTO Genre (Genre_Name)
+    VALUES (NEW.Genre_Name)
+    ON CONFLICT (Genre_Name) DO NOTHING;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 
 
@@ -287,14 +282,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create a trigger to call the add_game_region_on_game_insert() function
-CREATE TRIGGER before_game_insert2
-BEFORE INSERT ON Game
-FOR EACH ROW
-EXECUTE FUNCTION add_game_region_on_game_insert();
-
-
-
 
 
 
@@ -311,15 +298,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create a trigger to call the add_game_genre_on_game_insert() function
-CREATE TRIGGER before_game_insert3
-BEFORE INSERT ON Game
-FOR EACH ROW
-EXECUTE FUNCTION add_game_genre_on_game_insert();
-
-
-
-
 
 
 -- Create a function to add (game, language) to game_lang
@@ -335,11 +313,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION wrapper_game_function()
+RETURNS TRIGGER AS $$
+BEGIN
+    
+    PERFORM add_genre_on_game_insert()
+
+    PERFORM add_genre_on_game_insert()
+
+    PERFORM add_game_genre_on_game_insert()
+
+    PERFORM add_game_lang_on_game_insert()
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
 -- Create a trigger to call the add_game_lang_on_game_insert() function
-CREATE TRIGGER before_game_insert4
+CREATE TRIGGER before_game_insert
 BEFORE INSERT ON Game
 FOR EACH ROW
-EXECUTE FUNCTION add_game_lang_on_game_insert();
+EXECUTE FUNCTION wrapper_game_function();
 
 
 
