@@ -58,6 +58,7 @@ def add_review():
             detail=f"Error calling stored procedure make_follow_request: {e}",
         )
 
+
 @app.route("/get_reviews_for_game", methods=["GET"])
 def get_reviews_for_game():
     try:
@@ -84,6 +85,7 @@ def get_reviews_for_game():
             detail=f"Error calling stored procedure get_reviews_for_game: {e}",
         )
 
+
 @app.route("/add_gpc", methods=["POST"])
 def add_gpc():
     try:
@@ -92,7 +94,9 @@ def add_gpc():
         p_gpc_name = data.get("p_gpc_name")
         p_email_id = data.get("p_email_id")
         with get_db() as cursor:
-            cursor.execute(f"SELECT add_gpc({p_gpc_id}, '{p_gpc_name}', '{p_email_id}')")
+            cursor.execute(
+                f"SELECT add_gpc({p_gpc_id}, '{p_gpc_name}', '{p_email_id}')"
+            )
         return {"message": "GPC added successfully"}
     except HTTPException as e:
         raise e  # Rethrow HTTPException with status code and details
@@ -101,6 +105,7 @@ def add_gpc():
             status_code=500,
             detail=f"Error calling stored procedure add_gpc: {str(e)}",
         )
+
 
 @app.route("/get_bought_games", methods=["GET"])
 def get_bought_games():
@@ -112,9 +117,7 @@ def get_bought_games():
             cursor.execute(f"SELECT * FROM get_bought_games({user_id});")
             bought_games = []
             for row in cursor:
-                bought_games.append(
-                    {"Game_Name": row[0], "GPC_Name": row[1]}
-                )
+                bought_games.append({"Game_Name": row[0], "GPC_Name": row[1]})
 
             return jsonify(bought_games), 200
     except HTTPException as e:
@@ -125,29 +128,35 @@ def get_bought_games():
             detail=f"Error calling stored procedure make_follow_request: {e}",
         )
 
+
 @app.route("/add_game", methods=["POST"])
 def add_game():
-    try:
-        data = request.json
-        p_game_id = data.get("p_game_id")
-        p_game_name = data.get("p_game_name")
-        p_price = data.get("p_price")
-        p_gpc_id = data.get("p_gpc_id")
-        p_game_release_date = data.get("p_game_release_date")
-        p_age_limit = data.get("p_age_limit")
-        with get_db() as cursor:
-            cursor.execute(
-                f"SELECT add_game({p_game_id},'{p_game_name}', {p_price},{p_gpc_id},'{p_game_release_date}', {p_age_limit});"
-            )
-
-        return {"message": "Game added successfully"}
-    except HTTPException as e:
-        raise e  # Rethrow HTTPException with status code and details
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error calling stored procedure add_game: {str(e)}",
+    # try:
+    data = request.json
+    p_game_id = data.get("p_game_id")
+    p_game_name = data.get("p_game_name")
+    p_price = data.get("p_price")
+    p_gpc_id = data.get("p_gpc_id")
+    p_game_release_date = data.get("p_game_release_date")
+    p_age_limit = data.get("p_age_limit")
+    p_region_id = data.get("p_region_id")
+    p_genre_id = data.get("p_genre_id")
+    p_genre_name = data.get("p_genre_name")
+    p_lang_id = data.get("p_lang_id")
+    with get_db() as cursor:
+        cursor.execute(
+            f"SELECT add_game({p_game_id},'{p_game_name}', {p_price},{p_gpc_id},'{p_game_release_date}', {p_age_limit},{p_region_id}, {p_genre_id}, '{p_genre_name}', {p_lang_id});"
         )
+
+    return {"message": "Game added successfully"}
+    # except HTTPException as e:
+    #     raise e  # Rethrow HTTPException with status code and details
+    # except Exception as e:
+    #     raise HTTPException(
+    #         status_code=500,
+    #         detail=f"Error calling stored procedure add_game: {str(e)}",
+    #     )
+
 
 @app.route("/user_login", methods=["POST"])
 def user_login():
@@ -180,6 +189,7 @@ def user_login():
             detail=f"Error calling stored procedure make_follow_request: {e}",
         )
 
+
 @app.route("/purchase_game", methods=["POST"])
 def purchase_game():
     try:
@@ -199,6 +209,7 @@ def purchase_game():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error calling stored procedure make_follow_request: {e}",
         )
+
 
 # #get request to show all reviews of a game
 # @app.route("/game/<int:game_id>/reviews", methods=["GET"])
