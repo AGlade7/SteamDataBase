@@ -26,7 +26,7 @@ def get_db():
         makeProcedurePath = (
             Path(__file__)
             .resolve()
-            .parent.parent.joinpath("create_database/producure.sql")
+            .parent.parent.joinpath("create_database/userSpecs.sql")
         )
         with open(makeDBPath, "r") as sql_file:
             sql_query = sql_file.read()
