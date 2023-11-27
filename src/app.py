@@ -46,9 +46,8 @@ def add_review():
         game_id = data.get("p_game_id")
         content = data.get("p_content")
 
-        # Call the stored procedure to add a review
         with get_db() as cursor:
-            cursor.execute(f"CALL add_review({user_id}, {game_id}, '{content}')")
+            cursor.execute(f"SELECT add_review({user_id}, {game_id}, '{content}')")
 
         return jsonify({"message": "Review added successfully"}), 201
     except HTTPException as e:
@@ -59,33 +58,31 @@ def add_review():
             detail=f"Error calling stored procedure make_follow_request: {e}",
         )
 
-
-@app.route("/get_reviews_for_game", methods=["POST"])
+@app.route("/get_reviews_for_game", methods=["GET"])
 def get_reviews_for_game():
-    data = request.json
-    game_id = data.get("p_game_id")
-    with get_db() as cursor:
-        cursor.execute(f"SELECT * FROM get_reviews_for_game({game_id})")
-        reviews = []
-        for row in cursor:
-            reviews.append(
-                {
-                    "User_Name": row.User_Name,
-                    "Content": row.Content,
-                    "Posted_Time": str(row.Posted_Time),
-                }
-            )
+    try:
+        data = request.json
+        game_id = data.get("p_game_id")
+        with get_db() as cursor:
+            cursor.execute(f"SELECT * FROM get_reviews_for_game({game_id})")
+            reviews = []
+            for row in cursor:
+                reviews.append(
+                    {
+                        "User_Name": row[0],
+                        "Content": row[1],
+                        "Posted_Time": str(row[2]),
+                    }
+                )
 
-        return jsonify(reviews), 200
-
-    # except HTTPException as e:
-    #     raise e  # Rethrow HTTPException with status code and details
-    # except Exception as e:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail=f"Error calling stored procedure get_reviews_for_game: {e}",
-    #     )
-
+            return jsonify(reviews), 200
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure get_reviews_for_game: {e}",
+        )
 
 @app.route("/add_gpc", methods=["POST"])
 def add_gpc():
