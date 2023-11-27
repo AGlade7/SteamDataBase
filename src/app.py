@@ -107,29 +107,26 @@ def add_gpc():
 
 @app.route("/get_bought_games", methods=["GET"])
 def get_bought_games():
-    # try:
-    data = request.json
-    user_id = data.get("p_user_id")
-    # Process the result into a JSON response
-    with get_db() as cursor:
-        cursor.execute(f"SELECT * FROM get_bought_games({user_id});")
+    try:
+        data = request.json
+        user_id = data.get("p_user_id")
         # Process the result into a JSON response
-        print(cursor)
-        bought_games = []
-        for row in cursor:
-            bought_games.append(
-                {"Game_Name": row.Game_ID, "GPC_Name": row.User_ID}
-            )
+        with get_db() as cursor:
+            cursor.execute(f"SELECT * FROM get_bought_games({user_id});")
+            bought_games = []
+            for row in cursor:
+                bought_games.append(
+                    {"Game_Name": row[0], "GPC_Name": row[1]}
+                )
 
-        return jsonify(bought_games), 200
-    # except HTTPException as e:
-    #     raise e  # Rethrow HTTPException with status code and details
-    # except Exception as e:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail=f"Error calling stored procedure make_follow_request: {e}",
-    #     )
-
+            return jsonify(bought_games), 200
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure make_follow_request: {e}",
+        )
 
 @app.route("/add_game", methods=["POST"])
 def add_game():
