@@ -16,34 +16,34 @@ def home():
 
 @app.route("/get_games_by_genre_region_and_age", methods=["GET"])
 def get_games_by_genre_region_and_age():
-    # try:
-    data = request.json
-    genre_name = data.get("p_genre_name")
-    region_name = data.get("p_region_name")
-    user_age = data.get("p_user_age")
-    with get_db() as cursor:
-        cursor.execute(
-            f"SELECT * FROM get_games_by_genre_region_and_age('{genre_name}', '{region_name}', {user_age})"
-        )
-        # Convert the result to a list of dictionaries
-        games = []
-        for row in cursor:
-            games.append(
-                {
-                    "Game_Name": row[0],
-                    "Price": row[1],
-                    "GPC_Name": row[2],
-                    "Region_Name": row[3],
-                }
+    try:
+        data = request.json
+        genre_name = data.get("p_genre_name")
+        region_name = data.get("p_region_name")
+        user_age = data.get("p_user_age")
+        with get_db() as cursor:
+            cursor.execute(
+                f"SELECT * FROM get_games_by_genre_region_and_age('{genre_name}', '{region_name}', {user_age})"
             )
-        return jsonify({"games": games}), 200
-    # except HTTPException as e:
-    #     raise e  # Rethrow HTTPException with status code and details
-    # except Exception as e:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail=f"Error calling stored procedure make_follow_request: {e}",
-    #     )
+            # Convert the result to a list of dictionaries
+            games = []
+            for row in cursor:
+                games.append(
+                    {
+                        "Game_Name": row[0],
+                        "Price": row[1],
+                        "GPC_Name": row[2],
+                        "Region_Name": row[3],
+                    }
+                )
+            return jsonify({"games": games}), 200
+    except HTTPException as e:
+        raise e  # Rethrow HTTPException with status code and details
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error calling stored procedure make_follow_request: {e}",
+        )
 
 
 @app.route("/add_review", methods=["POST"])
