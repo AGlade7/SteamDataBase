@@ -11,6 +11,7 @@ load_dotenv(ENV_PATH)
 url = os.getenv("database_URL")
 print(url)
 
+
 @contextmanager
 def get_db():
     try:
@@ -22,9 +23,17 @@ def get_db():
             .resolve()
             .parent.parent.joinpath("create_database/makeDB.sql")
         )
+        makeProcedurePath = (
+            Path(__file__)
+            .resolve()
+            .parent.parent.joinpath("create_database/producure.sql")
+        )
         with open(makeDBPath, "r") as sql_file:
             sql_query = sql_file.read()
+        with open(makeProcedurePath, "r") as sql_file:
+            sql_query2 = sql_file.read()
         cursor.execute(sql_query)
+        cursor.execute(sql_query2)
         yield cursor
         conn.commit()
     except Exception as e:
